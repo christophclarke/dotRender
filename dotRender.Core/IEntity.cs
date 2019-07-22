@@ -3,8 +3,14 @@ namespace dotRender.Core {
     using System.Collections.Generic;
 
     public interface IEntity {
+        int XMin { get; }
+        int XMax { get; }
+        int YMin { get; }
+        int YMax { get; }
+
         void Update(ConsoleKeyInfo? keyPressed, Renderer game);
         void Render();
+        bool CheckCollision(IEntity entity);
     }
 
     public abstract class EntityBase : IEntity {
@@ -18,6 +24,14 @@ namespace dotRender.Core {
 
         protected abstract char[][] Sprite { get; set; }
 
+        public int XMin => this.XPos;
+
+        public int XMax => this.XPos + this.Sprite[0].Length;
+
+        public int YMin => this.YPos;
+
+        public int YMax => this.YPos + this.Sprite.Length;
+
         public abstract void Update(ConsoleKeyInfo? keyPressed, Renderer game);
 
         public void Render() {
@@ -25,6 +39,11 @@ namespace dotRender.Core {
                 Console.SetCursorPosition(this.XPos, this.YPos + row);
                 Console.Write(string.Join("", this.Sprite[row]));
             }
+        }
+
+        public bool CheckCollision(IEntity entity) {
+            return this.XMax > entity.XMin && this.XMin < entity.XMax
+                   && this.YMax > entity.YMin && this.YMin < entity.YMax;
         }
     }
 }

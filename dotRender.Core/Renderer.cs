@@ -6,10 +6,10 @@ namespace dotRender.Core {
 
     public class Renderer {
         public Renderer() {
-            this.Entities = new List<IEntity>();
+            this.Entities = new HashSet<IEntity>();
         }
 
-        public ICollection<IEntity> Entities { get; set; }
+        public ISet<IEntity> Entities { get; set; }
 
         public void Run(string title = "untitled", int height = 500, int width = 500) {
             Console.CursorVisible = false;
@@ -18,8 +18,7 @@ namespace dotRender.Core {
             var m = new FPSMonitor();
 
             this.Entities.Add(new BlockEntity());
-            // this.Entities.Add(new BlockEntity(25, 5));
-            // this.Entities.Add(new BlockEntity(10, 10));
+            this.Entities.Add(new BlockEntityP2(50, 10));
 
             while (true) {
                 Console.Clear();
@@ -41,7 +40,7 @@ namespace dotRender.Core {
                 }
 
                 Console.SetCursorPosition(0,0);
-                Thread.Sleep(100);
+                Thread.Sleep(50);
             }
         }
     }

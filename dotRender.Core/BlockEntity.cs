@@ -1,6 +1,7 @@
 namespace dotRender.Core {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public class BlockEntity : EntityBase {
         public BlockEntity(int initX = 0, int initY = 0) : base(initX, initY) { }
@@ -14,67 +15,90 @@ namespace dotRender.Core {
         };
 
         public override void Update(ConsoleKeyInfo? keyPressed, Renderer game) {
-            if (!keyPressed.HasValue) {
-                return;
+            if (keyPressed.HasValue) {
+                switch (keyPressed.Value.Key) {
+                    case ConsoleKey.W:
+                        this.HandleUp();
+                        break;
+                    case ConsoleKey.S:
+                        this.HandleDown();
+                        break;
+                    case ConsoleKey.A:
+                        this.HandleLeft();
+                        break;
+                    case ConsoleKey.D:
+                        this.HandleRight();
+                        break;
+                    case ConsoleKey.Spacebar:
+                        game.Entities.Add(new BulletBlock(this.XPos + 5, this.YPos + 2, 2, 0));
+                        break;
+                }
             }
 
-            switch (keyPressed.Value.Key) {
-                case ConsoleKey.UpArrow:
-                    this.HandleUp();
-                    break;
-                case ConsoleKey.DownArrow:
-                    this.HandleDown();
-                    break;
-                case ConsoleKey.LeftArrow:
-                    this.HandleLeft();
-                    break;
-                case ConsoleKey.RightArrow:
-                    this.HandleRight();
-                    break;
-                case ConsoleKey.Spacebar:
-                    game.Entities.Add(new BulletBlock(this.XPos + 5, this.YPos + 2));
-                    break;
+            HashSet<IEntity> o = game.Entities.ToHashSet();
+            o.Remove(this);
+            foreach (IEntity other in o) {
+                if (this.CheckCollision(other)) {
+                    Console.WriteLine("COLLISION");
+                    game.Entities.Remove(this);
+                    // game.Entities.Remove(other);
+                }
             }
         }
 
-        private void HandleUp() {
+        protected void HandleUp() {
             if (this.YPos != 0) {
                 this.YPos--;
             }
         }
 
-        private void HandleDown() {
+        protected void HandleDown() {
             this.YPos++;
         }
 
-        private void HandleLeft() {
+        protected void HandleLeft() {
             if (this.XPos != 0) {
                 this.XPos--;
             }
         }
 
-        private void HandleRight() {
+        protected void HandleRight() {
             this.XPos++;
         }
     }
 
-    class BulletBlock : EntityBase {
-        public BulletBlock(int xPos, int yPos) : base(xPos, yPos) {
-            this.xVel = 2;
-        }
-
-        private int xVel;
-
-        protected override char[][] Sprite { get; set; } = {
-            new[] {'#', '#', '#'}
-        };
+    public class BlockEntityP2 : BlockEntity {
+        public BlockEntityP2(int initX = 0, int initY = 0) : base(initX, initY) { }
 
         public override void Update(ConsoleKeyInfo? keyPressed, Renderer game) {
-            if (this.XPos + 4 >= Console.WindowWidth || this.YPos + 4 >= Console.WindowHeight) {
-                game.Entities.Remove(this);
+            if (keyPressed.HasValue) {
+                switch (keyPressed.Value.Key) {
+                    case ConsoleKey.D8:
+                        this.HandleUp();
+                        break;
+                    case ConsoleKey.D2:
+                        this.HandleDown();
+                        break;
+                    case ConsoleKey.D4:
+                        this.HandleLeft();
+                        break;
+                    case ConsoleKey.D6:
+                        this.HandleRight();
+                        break;
+                    case ConsoleKey.D0:
+                        game.Entities.Add(new BulletBlock(this.XPos - 5, this.YPos + 2,-2, 0));
+                        break;
+                }
             }
 
-            this.XPos += this.xVel;
+            HashSet<IEntity> o = game.Entities.ToHashSet();
+            o.Remove(this);
+            foreach (IEntity other in o) {
+                if (this.CheckCollision(other)) {
+                    Console.WriteLine("COLLISION");
+                    game.Entities.Remove(this);
+                }
+            }
         }
     }
 }
